@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	    <link href="/static/default.css" rel="stylesheet">
+	    <link href="/static/github.css" rel="stylesheet" type="text/css" />
+  <title>ChatGPT4 in BING</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+    }
+    form, label, textarea, input {
+      box-sizing: border-box;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+      margin-bottom: 50px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      clear: both;
+    }
+    label {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    textarea {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="submit"] {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    input[type="submit"]:hover {
+      background-color: #0062cc;
+    }
+    #output_text {
+      margin-top: 30px;
+      width: 98%;
+      height: 700px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+      overflow-y: scroll;
+    }
+    .form-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $("#calculate_form").submit(function (e) {
+              e.preventDefault();
+              var calculate_btn = $('#calculate_btn');
+              calculate_btn.prop('disabled', true);
+              calculate_btn.prop('value', '正在生成，请稍后...');
+
+              // var loading_div = $('#loading');
+              // loading_div.show();
+              $.ajax({
+                  url: '/bing_chat',
+                  type: 'POST',
+                  data: {input_text: $('#input_text').val()},
+                  success: function (response) {
+                      // loading_div.hide();
+                      console.log(response)
+                      calculate_btn.prop('disabled', false);
+                      calculate_btn.prop('value', '确认');
+                      $("#output_text").html(response.replace(/&lt;/g, "<").replace(/&gt;/g, ">"))
+                  }
+              });
+          });
+      });
+  </script>
+
+
+</head>
+<body>
+  <!-- <div id="loading" style="display:none">正在生成，请稍后...</div> -->
+  <div style="flex-direction: column;">
+    <form action="{{ url_for('chat_v3') }}" style="clear: both;" id="calculate_form" method="post">
+      <label for="input_text">问题</label>
+      <textarea id="input_text" name="input_text" rows="5" cols="120" placeholder="这个一个基于Bing的ChatGPT4的示例工具，请在此输入问题。根据问题描述的范围，生成时长不一，预计在1分钟左右。"></textarea>
+      <input type="submit" id="calculate_btn" value="确认">
+      <!-- <button id="submit" value="确认"> -->
+    </form>
+
+<!--    <form action="" name="">-->
+<!--      <label for="output_text">回答</label>-->
+<!--      <textarea id="output_text" name="output_text">{{ output_text }}</textarea>-->
+<!--    </form>-->
+    <div class="textarea-wrapper">
+      <label for="output_text">回答</label>
+      <div id="output_text" name="output_text" class="textarea">{{ output_text }}</div>
+    </div>
+  </div>
+
+</body>
+</html>

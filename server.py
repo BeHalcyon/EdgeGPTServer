@@ -93,8 +93,22 @@ async def main():
     await bot.close()
 
 
+@app.route('/', methods=['GET'])
+def index(output_text=""):
+  # 渲染html文件，初始时输出框为空
+  return render_template('ui_index.html', output_text=output_text)
+
+@app.route('/bing_chat', methods=['POST'])
+def chat_v3():
+  input_text = request.form['input_text']
+  print("Ask:", input_text)
+  res = asyncio.run(generate_response_once(input_text))
+  content = md2html(res)
+  print("Answer:", content)
+  return content
+
 # if __name__ == "__main__":
 #     asyncio.run(main())
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
